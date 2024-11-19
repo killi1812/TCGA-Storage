@@ -2,7 +2,7 @@ version: "3"
 
 vars:
   PROJECT_CODE: TCGA-storage
-  BUILD_LOCATION: ./Build
+  BUILD_LOCATION: ./build
 
 tasks:
   default:
@@ -25,4 +25,13 @@ tasks:
       GOARCH: amd64
     cmds:
       - cmd: mkdir -p {{.BUILD_LOCATION}}
+      - cmd: cp -r ./wwwroot {{.BUILD_LOCATION}}
       - cmd: go build -o {{.BUILD_LOCATION}}/{{.PROJECT_CODE}}
+
+  clean:
+    cmd: rm -rf {{.BUILD_LOCATION}}/*
+
+  rebuild:
+    cmds:
+      - task: clean
+      - task: build
