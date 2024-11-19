@@ -1,0 +1,28 @@
+version: "3"
+
+vars:
+  PROJECT_CODE: TCGA-storage
+  BUILD_LOCATION: ./Build
+
+tasks:
+  default:
+    task: run
+
+  run:
+    cmds:
+      - task: start
+      - cmd: go run .
+
+  start:
+    cmd: docker-compose up -d
+
+  stop:
+    cmd: docker-compose stop
+
+  build:
+    env:
+      GOOS: linux
+      GOARCH: amd64
+    cmds:
+      - cmd: mkdir -p {{.BUILD_LOCATION}}
+      - cmd: go build -o {{.BUILD_LOCATION}}/{{.PROJECT_CODE}}

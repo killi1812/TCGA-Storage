@@ -1,0 +1,9 @@
+
+*.[Ll]og
+*[Ll]og
+[Bb]uild
+appsettings.json
+.env
+*.[Ss]wap
+*.sum
+*.old
