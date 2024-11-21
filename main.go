@@ -33,7 +33,7 @@ func main() {
 		api.NewTestController(),
 	})
 
-	fmt.Printf("listeing in http://localhost:%s\n", config.GetPort())
+	fmt.Printf("listeing on http://localhost:%s\n", config.GetPort())
 	err = http.ListenAndServe(fmt.Sprintf(":%s", config.GetPort()), nil)
 	if err != nil {
 		fmt.Print(err)
