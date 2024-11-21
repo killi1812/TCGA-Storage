@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TCGA-storage/config"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,13 +9,20 @@ import (
 
 func main() {
 	fmt.Println("App started")
+	err := config.LoadConfig()
+	if err != nil {
+		fmt.Print(err)
+		panic(1)
+	}
+
 	http.Handle("/", http.FileServer(http.Dir("./wwwroot/")))
 	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Test")
 	})
-	fmt.Println("listeing in http://localhost:3050")
-	err := http.ListenAndServe(":3050", nil)
+	fmt.Printf("listeing in http://localhost:%s\n", config.GetPort())
+	err = http.ListenAndServe(fmt.Sprintf(":%s", config.GetPort()), nil)
 	if err != nil {
-		print(err)
+		fmt.Print(err)
+		panic(2)
 	}
 }
