@@ -29,6 +29,7 @@ func GetPort() string {
 }
 
 func LoadConfig() error {
+	fmt.Println("Loading config")
 	bytes, err := os.ReadFile(fileName)
 	if err != nil {
 		return fmt.Errorf("Error reading config: %s, %s", fileName, err.Error())
@@ -39,5 +40,6 @@ func LoadConfig() error {
 	if err != nil {
 		return fmt.Errorf("Error Unmarshaling config: %s, %s", fileName, err.Error())
 	}
+	fmt.Println("Config loaded succesfuly")
 	return nil
 }
