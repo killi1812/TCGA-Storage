@@ -7,26 +7,21 @@ import (
 )
 
 type Settings struct {
-	MongoConnString string `json:"MongoConnString"`
-	MinioConnString string `json:"MinioConnString"`
-	AppPort         string `json:"AppPort"`
+	MongoConnString string      `json:"MongoConnString"`
+	MinioConn       MinioConfig `json:"MinioConn"`
+	AppPort         string      `json:"AppPort"`
+}
+
+type MinioConfig struct {
+	Endpoint        string `json:Endpoint`
+	AccessKeyID     string `json:AccessKeyID`
+	SecretAccessKey string `json:SecretAccessKey`
+	UseSSL          bool   `json:UseSSL`
 }
 
 const fileName = "appsettings.json"
 
-var conf Settings = Settings{}
-
-func GetMongoDbConnString() string {
-	return conf.MongoConnString
-}
-
-func GetMinIOConnString() string {
-	return conf.MinioConnString
-}
-
-func GetPort() string {
-	return conf.AppPort
-}
+var Conf Settings = Settings{}
 
 func LoadConfig() error {
 	fmt.Println("Loading config")
@@ -35,7 +30,7 @@ func LoadConfig() error {
 		return fmt.Errorf("Error reading config: %s \n%s", fileName, err.Error())
 	}
 
-	err = json.Unmarshal(bytes, &conf)
+	err = json.Unmarshal(bytes, &Conf)
 
 	if err != nil {
 		return fmt.Errorf("Error Unmarshaling config: %s \n%s", fileName, err.Error())

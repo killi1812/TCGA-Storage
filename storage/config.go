@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"TCGA-storage/config"
+	"context"
 	"fmt"
 	"sync"
 
@@ -16,21 +18,26 @@ var MinioClient *minio.Client
 
 func Setup() error {
 	fmt.Println("Setting up Minio client")
-	endpoint := "play.min.io"
-	accessKeyID := "Q3AM3UQ867SPQQA43P2F"
-	secretAccessKey := "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
-	useSSL := true
 
 	// Initialize minio client object.
-	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
+	minioClient, err := minio.New(config.Conf.MinioConn.Endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(config.Conf.MinioConn.AccessKeyID, config.Conf.MinioConn.SecretAccessKey, ""),
+		Secure: config.Conf.MinioConn.UseSSL,
 	})
 	if err != nil {
 		return fmt.Errorf("Failed to create MinIO client\n%s", err.Error())
 	}
 
 	MinioClient = minioClient
+
+	lock.Lock()
+	defer lock.Unlock()
+	name := "test"
+	_, err = MinioClient.BucketExists(context.Background(), name)
+	if err != nil {
+		return fmt.Errorf("Error pinging minio service with config(%s, %s)\n%s\n", config.Conf.MinioConn.Endpoint, config.Conf.MinioConn.AccessKeyID, err.Error())
+	}
+
 	fmt.Println("MinIO client Setup successfully ")
 	return nil
 }

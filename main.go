@@ -30,14 +30,18 @@ func main() {
 	}
 
 	err = storage.Setup()
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(1)
+	}
 
 	err = config.RegiserControllers([]config.Controller{
 		ftp.NewPageController(),
 		api.NewTestController(),
 	})
 
-	fmt.Printf("Listeing on http://localhost:%s\n", config.GetPort())
-	err = http.ListenAndServe(fmt.Sprintf(":%s", config.GetPort()), nil)
+	fmt.Printf("Listeing on http://localhost:%s\n", config.Conf.AppPort)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", config.Conf.AppPort), nil)
 	if err != nil {
 		fmt.Print(err)
 		panic(2)
