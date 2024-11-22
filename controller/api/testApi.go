@@ -1,6 +1,7 @@
 package api
 
 import (
+	"TCGA-storage/storage"
 	"encoding/json"
 	"net/http"
 )
@@ -13,8 +14,10 @@ func NewTestController() *TestController {
 }
 
 func (this *TestController) RegisterEndpoints() error {
-	http.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode("Test")
+	http.HandleFunc("/api/ping-minio", func(w http.ResponseWriter, r *http.Request) {
+		s := storage.MinioStorage{}
+		rez := s.CheckBucket("test")
+		json.NewEncoder(w).Encode(rez)
 	})
 
 	return nil

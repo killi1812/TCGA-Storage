@@ -32,13 +32,13 @@ func LoadConfig() error {
 	fmt.Println("Loading config")
 	bytes, err := os.ReadFile(fileName)
 	if err != nil {
-		return fmt.Errorf("Error reading config: %s, %s", fileName, err.Error())
+		return fmt.Errorf("Error reading config: %s \n%s", fileName, err.Error())
 	}
 
 	err = json.Unmarshal(bytes, &conf)
 
 	if err != nil {
-		return fmt.Errorf("Error Unmarshaling config: %s, %s", fileName, err.Error())
+		return fmt.Errorf("Error Unmarshaling config: %s \n%s", fileName, err.Error())
 	}
 	fmt.Println("Config loaded succesfuly")
 	return nil

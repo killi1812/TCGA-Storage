@@ -1,3 +1,8 @@
 h1 {
   color: blue;
 }
+
+#ping {
+  width: 5rem;
+  height: 5rem;
+}

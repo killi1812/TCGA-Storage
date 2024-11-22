@@ -4,6 +4,7 @@ import (
 	"TCGA-storage/config"
 	"TCGA-storage/controller/api"
 	"TCGA-storage/controller/ftp"
+	"TCGA-storage/storage"
 	"fmt"
 	"net/http"
 	"os"
@@ -28,12 +29,14 @@ func main() {
 		panic(1)
 	}
 
+	err = storage.Setup()
+
 	err = config.RegiserControllers([]config.Controller{
 		ftp.NewPageController(),
 		api.NewTestController(),
 	})
 
-	fmt.Printf("listeing on http://localhost:%s\n", config.GetPort())
+	fmt.Printf("Listeing on http://localhost:%s\n", config.GetPort())
 	err = http.ListenAndServe(fmt.Sprintf(":%s", config.GetPort()), nil)
 	if err != nil {
 		fmt.Print(err)
