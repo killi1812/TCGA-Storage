@@ -10,11 +10,11 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-//This will be a singleton
-//if there will be a need for a connection pool it will be added
-
-var lock sync.Mutex
+// This will be a singleton
+// if there will be a need for a connection pool it will be added
+// TODO change this to conn pool after more resarch
 var MinioClient *minio.Client
+var lock sync.Mutex
 
 func Setup() error {
 	fmt.Println("Setting up Minio client")
