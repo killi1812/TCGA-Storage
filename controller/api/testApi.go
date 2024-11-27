@@ -27,9 +27,9 @@ func (this *TestController) RegisterEndpoints() error {
 }
 
 func (this *TestController) upload(w http.ResponseWriter, r *http.Request) {
-	file, fileHeader, err := r.FormFile("file")
+	file, fileHeader, err := r.FormFile("filename")
 	if err != nil {
-		fmt.Printf("Error reading file \n%s\n", err.Error())
+		fmt.Printf("Error reading file \n\t%s\n", err.Error())
 		return
 	}
 	defer file.Close()
