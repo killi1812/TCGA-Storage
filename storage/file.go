@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"mime/multipart"
+	"os"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -15,15 +16,35 @@ func New() *MinioStorage {
 	return &MinioStorage{}
 }
 
+const bucketName = "test"
+
 func (this *MinioStorage) Upload(file multipart.File, header *multipart.FileHeader) error {
 	lock.Lock()
 	defer lock.Unlock()
 	_, err := MinioClient.PutObject(
 		context.Background(),
-		"test",
+		bucketName,
 		header.Filename,
 		file,
 		header.Size,
+		minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	if err != nil {
+		return fmt.Errorf("Failed to upload \n%s", err.Error())
+	}
+
+	return nil
+}
+
+func (this *MinioStorage) UploadFile(file *os.File, size int64) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	_, err := MinioClient.PutObject(
+		context.Background(),
+		bucketName,
+		file.Name(),
+		file,
+		size,
 		minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return fmt.Errorf("Failed to upload \n%s", err.Error())
