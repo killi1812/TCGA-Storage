@@ -13,12 +13,17 @@ func Run() error {
 	}
 	go func() {
 
-		//err := download()
-		//if err != nil {
-		// fmt.Errorf("%s", err.Error())
-		//}
+		err := download()
+		if err != nil {
+			fmt.Errorf("%s", err.Error())
+		}
 
-		err := upload()
+		err = upload()
+		if err != nil {
+			fmt.Errorf("%s", err.Error())
+		}
+
+		err = clean()
 		if err != nil {
 			fmt.Errorf("%s", err.Error())
 		}
@@ -43,10 +48,9 @@ func download() error {
 }
 
 func upload() error {
+	workingDir := data + "/"
 
-	//TODO: Rework path combinging and path saving
-
-	files, err := os.ReadDir(path + data)
+	files, err := os.ReadDir(workingDir)
 	if err != nil {
 		return err
 	}
@@ -54,7 +58,7 @@ func upload() error {
 	var errors error = nil
 	fmt.Printf("Uploading files\n")
 	for _, file := range files {
-		f, err := os.Open(path + data + "/" + file.Name())
+		f, err := os.Open(workingDir + file.Name())
 
 		if err != nil {
 			fmt.Printf("Failed to read file %s, error: %s\n", file.Name(), err.Error())
@@ -64,7 +68,6 @@ func upload() error {
 		}
 
 		stats, _ := file.Info()
-		fmt.Printf("%v\n", file.Name())
 		err = minioStorage.UploadFile(f, file.Name(), stats.Size())
 
 		if err != nil {
@@ -78,4 +81,17 @@ func upload() error {
 
 	fmt.Printf("Finished uploading files\n")
 	return errors
+}
+
+func clean() error {
+	workingDir := data + "/"
+	fmt.Printf("Cleaning %s\n", workingDir)
+
+	err := os.RemoveAll(workingDir)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Cleaning %s finished\n", workingDir)
+	return nil
 }

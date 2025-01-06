@@ -10,6 +10,7 @@ type Settings struct {
 	MongoConnString string      `json:"MongoConnString"`
 	MinioConn       MinioConfig `json:"MinioConn"`
 	AppPort         string      `json:"AppPort"`
+	ScrapperPath    string      `json:"ScrapperPath"`
 }
 
 type MinioConfig struct {
