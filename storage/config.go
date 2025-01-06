@@ -13,7 +13,7 @@ import (
 // This will be a singleton
 // if there will be a need for a connection pool it will be added
 // TODO change this to conn pool after more resarch
-var MinioClient *minio.Client
+var minioClientInstance *minio.Client
 var lock sync.Mutex
 
 func Setup() error {
@@ -28,12 +28,12 @@ func Setup() error {
 		return fmt.Errorf("Failed to create MinIO client\n%s", err.Error())
 	}
 
-	MinioClient = minioClient
+	minioClientInstance = minioClient
 
 	lock.Lock()
 	defer lock.Unlock()
 	name := "test"
-	_, err = MinioClient.BucketExists(context.Background(), name)
+	_, err = minioClientInstance.BucketExists(context.Background(), name)
 	if err != nil {
 		return fmt.Errorf("Error pinging minio service with config(%s, %s)\n%s\n", config.Conf.MinioConn.Endpoint, config.Conf.MinioConn.AccessKeyID, err.Error())
 	}

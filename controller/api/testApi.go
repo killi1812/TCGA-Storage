@@ -1,6 +1,7 @@
 package api
 
 import (
+	"TCGA-storage/scrapper"
 	"TCGA-storage/storage"
 	"encoding/json"
 	"fmt"
@@ -23,6 +24,7 @@ func (this *TestController) RegisterEndpoints() error {
 	})
 	http.HandleFunc("/api/upload", this.upload)
 	http.HandleFunc("/api/img/", this.download)
+	http.HandleFunc("/api/scrape/", this.scrape)
 	return nil
 }
 
@@ -36,6 +38,19 @@ func (this *TestController) upload(w http.ResponseWriter, r *http.Request) {
 
 	this.store.Upload(file, fileHeader)
 	//TODO redirect to img
+}
+
+func (this *TestController) scrape(w http.ResponseWriter, r *http.Request) {
+
+	err := scrapper.Run()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Printf("Scrapping requestfailed with error: %s\n", err.Error())
+		json.NewEncoder(w).Encode("Try again later")
+
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
 func (this *TestController) download(w http.ResponseWriter, r *http.Request) {

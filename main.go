@@ -4,6 +4,7 @@ import (
 	"TCGA-storage/config"
 	"TCGA-storage/controller/api"
 	"TCGA-storage/controller/ftp"
+	"TCGA-storage/scrapper"
 	"TCGA-storage/storage"
 	"fmt"
 	"net/http"
@@ -33,6 +34,11 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(1)
+	}
+
+	err = scrapper.Setup()
+	if err != nil {
+		fmt.Printf("scrapper is unavalable do to error %s\n", err.Error())
 	}
 
 	err = config.RegiserControllers([]config.Controller{

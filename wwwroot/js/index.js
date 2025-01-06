@@ -2,12 +2,24 @@
   const ping = async () => {
     const resp = await fetch("/api/ping-minio");
     const data = await resp.json();
-    console.log(data);
+    alert(data);
   };
-  const btn = document.getElementById("ping");
-  btn.addEventListener("click", ping);
+
+  const scrape = async () => {
+    const resp = await fetch("/api/scrape");
+    const data = await resp.json();
+    alert(data);
+  };
+
+  const pingBtn = document.getElementById("ping");
+  pingBtn.addEventListener("click", ping);
+
+  const scrapeBtn = document.getElementById("scrape");
+  scrapeBtn.addEventListener("click", scrape);
+
   const img = document.getElementById("img");
   const form = document.getElementById("upload");
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 

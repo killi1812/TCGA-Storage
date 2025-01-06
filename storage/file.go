@@ -21,7 +21,7 @@ const bucketName = "test"
 func (this *MinioStorage) Upload(file multipart.File, header *multipart.FileHeader) error {
 	lock.Lock()
 	defer lock.Unlock()
-	_, err := MinioClient.PutObject(
+	_, err := minioClientInstance.PutObject(
 		context.Background(),
 		bucketName,
 		header.Filename,
@@ -35,14 +35,14 @@ func (this *MinioStorage) Upload(file multipart.File, header *multipart.FileHead
 	return nil
 }
 
-func (this *MinioStorage) UploadFile(file *os.File, size int64) error {
+func (this *MinioStorage) UploadFile(file *os.File, fileName string, size int64) error {
 	lock.Lock()
 	defer lock.Unlock()
 
-	_, err := MinioClient.PutObject(
+	_, err := minioClientInstance.PutObject(
 		context.Background(),
 		bucketName,
-		file.Name(),
+		fileName,
 		file,
 		size,
 		minio.PutObjectOptions{ContentType: "application/octet-stream"})
@@ -57,7 +57,7 @@ func (this *MinioStorage) Download(name string) ([]byte, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	reader, err := MinioClient.GetObject(context.Background(), "test", name, minio.GetObjectOptions{})
+	reader, err := minioClientInstance.GetObject(context.Background(), "test", name, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (this *MinioStorage) Download(name string) ([]byte, error) {
 func (this *MinioStorage) CheckBucket(name string) bool {
 	lock.Lock()
 	defer lock.Unlock()
-	ret, err := MinioClient.BucketExists(context.Background(), name)
+	ret, err := minioClientInstance.BucketExists(context.Background(), name)
 	if err != nil {
 		fmt.Printf("Error accessing bucket: %s\n%s\n", name, err.Error())
 		return false
