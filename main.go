@@ -44,6 +44,7 @@ func main() {
 	err = config.RegiserControllers([]config.Controller{
 		ftp.NewPageController(),
 		api.NewTestController(),
+		api.NewScrapperController(),
 	})
 
 	fmt.Printf("Listeing on http://localhost:%s\n", config.Conf.AppPort)
