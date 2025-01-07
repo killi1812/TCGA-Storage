@@ -30,7 +30,6 @@ func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	//fmt.Printf("Started parsig %s", filename)
 	p := parser.GetParser()
 
 	data, err := p.Parse(file)

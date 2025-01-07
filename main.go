@@ -4,6 +4,7 @@ import (
 	"TCGA-storage/config"
 	"TCGA-storage/controller/api"
 	"TCGA-storage/controller/ftp"
+	"TCGA-storage/db"
 	"TCGA-storage/scrapper"
 	"TCGA-storage/storage"
 	"fmt"
@@ -31,6 +32,12 @@ func main() {
 	}
 
 	err = storage.Setup()
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(1)
+	}
+
+	err = db.Setup()
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(1)
