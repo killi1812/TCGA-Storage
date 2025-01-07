@@ -3,7 +3,6 @@ package scrapper
 import (
 	"TCGA-storage/config"
 	"TCGA-storage/storage"
-	"strings"
 	"sync"
 )
 
@@ -21,9 +20,6 @@ func Setup() error {
 	fileLock = sync.Mutex{}
 
 	path = config.Conf.ScrapperPath
-	if !strings.HasSuffix(path, "/") {
-		path += "/"
-	}
 
 	return nil
 }

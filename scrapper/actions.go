@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 func Run() error {
@@ -35,7 +36,8 @@ func Run() error {
 
 func download() error {
 	fmt.Printf("Scrapper started\n")
-	cmd := exec.Command("./" + path + prog)
+	programPath := filepath.Join(path, prog)
+	cmd := exec.Command(programPath)
 	_, err := cmd.CombinedOutput()
 
 	if err != nil {
@@ -48,7 +50,7 @@ func download() error {
 }
 
 func upload() error {
-	workingDir := data + "/"
+	workingDir := filepath.Join(data)
 
 	files, err := os.ReadDir(workingDir)
 	if err != nil {
@@ -58,7 +60,7 @@ func upload() error {
 	var errors error = nil
 	fmt.Printf("Uploading files\n")
 	for _, file := range files {
-		f, err := os.Open(workingDir + file.Name())
+		f, err := os.Open(filepath.Join(workingDir, file.Name()))
 
 		if err != nil {
 			fmt.Printf("Failed to read file %s, error: %s\n", file.Name(), err.Error())
@@ -84,7 +86,7 @@ func upload() error {
 }
 
 func clean() error {
-	workingDir := data + "/"
+	workingDir := filepath.Join(data)
 	fmt.Printf("Cleaning %s\n", workingDir)
 
 	err := os.RemoveAll(workingDir)
