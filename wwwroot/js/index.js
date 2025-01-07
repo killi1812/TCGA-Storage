@@ -33,4 +33,18 @@
     const name = filename.split("\\")[2];
     img.src = "/api/img/" + name;
   });
+
+  const dataForm = document.getElementById("data");
+
+  dataForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const filenameInput = dataForm.querySelector('[name="filename"]');
+    const filename = filenameInput ? filenameInput.value.trim() : "";
+    const dataFormData = new FormData(dataForm);
+    const response = await fetch(dataForm.action || "/", {
+      method: dataForm.method || "POST",
+      body: dataFormData,
+    });
+  });
 })();

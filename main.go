@@ -45,6 +45,7 @@ func main() {
 		ftp.NewPageController(),
 		api.NewTestController(),
 		api.NewScrapperController(),
+		api.NewDataController(),
 	})
 
 	fmt.Printf("Listeing on http://localhost:%s\n", config.Conf.AppPort)
