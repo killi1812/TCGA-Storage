@@ -1,6 +1,6 @@
 package parser
 
-type PatientData struct {
+type PatientDataWhole struct {
 	BCRPatientBarcode           string `json:"bcr_patient_barcode"`
 	Type                        string `json:"type"`
 	AgeAtDiagnosis              int    `json:"age_at_initial_pathologic_diagnosis"`
@@ -34,4 +34,11 @@ type PatientData struct {
 	PFI                         int    `json:"pfi"`
 	PFITime                     int    `json:"pfi_time"`
 	Redaction                   string `json:"redaction"`
+}
+
+type PatientData struct {
+	BCRPatientBarcode string `json:"bcr_patient_barcode"`
+	DSS               bool   `json:"dss"`
+	OS                bool   `json:"os"`
+	ClinicalStage     string `json:"clinical_stage"`
 }

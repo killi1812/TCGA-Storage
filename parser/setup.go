@@ -5,11 +5,22 @@ import "sync"
 type TsvParser struct {
 }
 
-var parserInstance *TsvParser = nil
+type TxtParser struct {
+}
 
-func GetParser() *TsvParser {
+var tsvParserInstance *TsvParser = nil
+var txtParserInstance *TxtParser = nil
+
+func GetTsvParser() *TsvParser {
 	sync.OnceFunc(func() {
-		parserInstance = &TsvParser{}
+		tsvParserInstance = &TsvParser{}
 	})
-	return parserInstance
+	return tsvParserInstance
+}
+
+func GetTxtParser() *TxtParser {
+	sync.OnceFunc(func() {
+		txtParserInstance = &TxtParser{}
+	})
+	return txtParserInstance
 }

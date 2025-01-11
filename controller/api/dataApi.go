@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type DataController struct {
@@ -30,12 +31,14 @@ func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	p := parser.GetParser()
+	p := parser.GetTsvParser()
 
 	data, err := p.Parse(file)
 	if err != nil {
 		fmt.Printf("failed parsing \n")
 	}
 
-	fmt.Printf("parsed data len: %d\n", len(data))
+	writer := strings.Builder{}
+	json.NewEncoder(&writer).Encode(data)
+	fmt.Printf("writer: %v\n", writer.String())
 }

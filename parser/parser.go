@@ -31,38 +31,10 @@ func (this *TsvParser) Parse(reader io.Reader) ([]PatientData, error) {
 
 		// Parse the fields into the struct
 		data := PatientData{
-			Type:                        record[1],
-			AgeAtDiagnosis:              intConv(record[2]),
-			Gender:                      record[3],
-			Race:                        record[4],
-			Stage:                       record[5],
-			ClinicalStage:               record[6],
-			HistologicalType:            record[7],
-			HistologicalGrade:           record[8],
-			InitialDiagnosisYear:        intConv(record[9]),
-			MenopauseStatus:             record[10],
-			BirthDaysTo:                 intConv(record[11]),
-			VitalStatus:                 record[12],
-			TumorStatus:                 record[13],
-			LastContactDaysTo:           intConv(record[14]),
-			DeathDaysTo:                 intConv(record[15]),
-			CauseOfDeath:                record[16],
-			NewTumorEventType:           record[17],
-			NewTumorEventSite:           record[18],
-			NewTumorEventSiteOther:      record[19],
-			NewTumorEventDxDaysTo:       intConv(record[20]),
-			TreatmentOutcomeFirstCourse: record[21],
-			MarginStatus:                record[22],
-			ResidualTumor:               record[23],
-			OS:                          intConv(record[24]),
-			OSTime:                      intConv(record[25]),
-			DSS:                         intConv(record[26]),
-			DSSTime:                     intConv(record[27]),
-			DFI:                         intConv(record[28]),
-			DFITime:                     intConv(record[29]),
-			PFI:                         intConv(record[30]),
-			PFITime:                     intConv(record[31]),
-			Redaction:                   record[32],
+			BCRPatientBarcode: record[1],
+			ClinicalStage:     record[7],
+			OS:                stob(record[25]),
+			DSS:               stob(record[27]),
 		}
 		result = append(result, data)
 	}
@@ -70,7 +42,50 @@ func (this *TsvParser) Parse(reader io.Reader) ([]PatientData, error) {
 	return result, nil
 }
 
-func intConv(str string) int {
-	br, _ := strconv.Atoi(str)
+func (this *TxtParser) Parse(reader io.Reader) ([]PatientGenesExpressions, error) {
+	csvReader := csv.NewReader(reader)
+	csvReader.Comma = '\t'
+
+	// Read the header
+	header, err := csvReader.Read()
+	patients := header[1:]
+	data := make([]PatientGenesExpressions, len(patients))
+
+	for i, p := range patients {
+		data[i].BCRPatientBarcode = p
+		data[i].Genes = make([]GeneExpressionPair, 20530)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to read header: %w", err)
+	}
+	row := 0
+	for {
+		record, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to read row: %w", err)
+		}
+
+		for i, val := range record[1:] {
+			data[i].Genes[row] = GeneExpressionPair{
+				Gene:       record[0],
+				Expression: stof(val),
+			}
+		}
+		row++
+	}
+	return data, nil
+}
+
+func stof(str string) float64 {
+	br, _ := strconv.ParseFloat(str, 64)
 	return br
+}
+
+func stob(str string) bool {
+	br, _ := strconv.Atoi(str)
+	return br == 1
 }
