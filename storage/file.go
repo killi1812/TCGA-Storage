@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"os"
 
@@ -53,11 +54,26 @@ func (this *MinioStorage) UploadFile(file *os.File, fileName string, size int64)
 	return nil
 }
 
+func (this *MinioStorage) GetAllReaders(name string) ([]io.ReadCloser, error) {
+	lock.Lock()
+	defer lock.Unlock()
+	readers := make([]io.ReadCloser, 0)
+
+	for file := range minioClientInstance.ListObjects(context.Background(), bucketName, minio.ListObjectsOptions{}) {
+		reader, err := minioClientInstance.GetObject(context.Background(), bucketName, file.Key, minio.GetObjectOptions{})
+		if err != nil {
+			return nil, err
+		}
+		readers = append(readers, reader)
+	}
+	return readers, nil
+}
+
 func (this *MinioStorage) Download(name string) ([]byte, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	reader, err := minioClientInstance.GetObject(context.Background(), "test", name, minio.GetObjectOptions{})
+	reader, err := minioClientInstance.GetObject(context.Background(), bucketName, name, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err
 	}

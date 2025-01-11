@@ -4,10 +4,11 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"slices"
 	"strconv"
 )
 
-func (this *TsvParser) Parse(reader io.Reader) ([]PatientData, error) {
+func (this *PatientParser) Parse(reader io.Reader) ([]PatientData, error) {
 	var result []PatientData
 
 	csvReader := csv.NewReader(reader)
@@ -42,40 +43,45 @@ func (this *TsvParser) Parse(reader io.Reader) ([]PatientData, error) {
 	return result, nil
 }
 
-func (this *TxtParser) Parse(reader io.Reader) ([]PatientGenesExpressions, error) {
+var genesFilter = []string{"C6orf150", "CCL5", "CXCL10", "TMEM173", "CXCL9", "CXCL11", "NFKB1", "IKBKE", "IRF3", "TREX1", "ATM", "IL6", "IL8"}
+
+func (this *GeneParser) Parse(reader io.ReadCloser, patientCode string) (PatientGenesExpressions, error) {
+	defer reader.Close()
 	csvReader := csv.NewReader(reader)
 	csvReader.Comma = '\t'
 
 	// Read the header
 	header, err := csvReader.Read()
 	patients := header[1:]
-	data := make([]PatientGenesExpressions, len(patients))
+	index := slices.Index(patients, patientCode)
+	if index == -1 {
+		return PatientGenesExpressions{}, PatientNotFound
+	}
 
-	for i, p := range patients {
-		data[i].BCRPatientBarcode = p
-		data[i].Genes = make([]GeneExpressionPair, 20530)
+	data := PatientGenesExpressions{
+		BCRPatientBarcode: patientCode,
+		Genes:             make([]GeneExpressionPair, len(genesFilter)),
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to read header: %w", err)
+		return PatientGenesExpressions{}, fmt.Errorf("failed to read header: %w", err)
 	}
-	row := 0
+	i := 0
 	for {
 		record, err := csvReader.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return nil, fmt.Errorf("failed to read row: %w", err)
+			return PatientGenesExpressions{}, fmt.Errorf("failed to read row: %w", err)
 		}
 
-		for i, val := range record[1:] {
-			data[i].Genes[row] = GeneExpressionPair{
+		if slices.Contains(genesFilter, record[0]) {
+			data.Genes[i] = GeneExpressionPair{
 				Gene:       record[0],
-				Expression: stof(val),
-			}
+				Expression: stof(record[index+1])}
+			i++
 		}
-		row++
 	}
 	return data, nil
 }

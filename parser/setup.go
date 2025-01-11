@@ -2,25 +2,25 @@ package parser
 
 import "sync"
 
-type TsvParser struct {
+type PatientParser struct {
 }
 
-type TxtParser struct {
+type GeneParser struct {
 }
 
-var tsvParserInstance *TsvParser = nil
-var txtParserInstance *TxtParser = nil
+var tsvParserInstance *PatientParser = nil
+var txtParserInstance *GeneParser = nil
 
-func GetTsvParser() *TsvParser {
+func GetPatientParser() *PatientParser {
 	sync.OnceFunc(func() {
-		tsvParserInstance = &TsvParser{}
+		tsvParserInstance = &PatientParser{}
 	})
 	return tsvParserInstance
 }
 
-func GetTxtParser() *TxtParser {
+func GetGeneParser() *GeneParser {
 	sync.OnceFunc(func() {
-		txtParserInstance = &TxtParser{}
+		txtParserInstance = &GeneParser{}
 	})
 	return txtParserInstance
 }
