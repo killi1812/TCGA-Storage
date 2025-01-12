@@ -21,7 +21,7 @@ Note that docker-compose uses `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` variab
 
 ___
 ### .NET 7 
-Used for running the [scrapper](https://github.com/killi1812/PPPK-Scrapper)+
+Used for running the [scrapper](https://github.com/killi1812/PPPK-Scrapper)
 ## Running the app
 Create appsettings.json based on [appsettings.example.json](https://github.com/killi1812/TCGA-Storage/blob/master/appsettings.example.json).
 
