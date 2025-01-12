@@ -16,6 +16,8 @@ import (
 var minioClientInstance *minio.Client
 var lock sync.Mutex
 
+const bucketName = "patient-data"
+
 func Setup() error {
 	fmt.Println("Setting up Minio client")
 
@@ -32,12 +34,19 @@ func Setup() error {
 
 	lock.Lock()
 	defer lock.Unlock()
-	name := "test"
-	_, err = minioClientInstance.BucketExists(context.Background(), name)
+	ok, err := minioClientInstance.BucketExists(context.Background(), bucketName)
 	if err != nil {
 		return fmt.Errorf("Error pinging minio service with config(%s, %s)\n%s\n", config.Conf.MinioConn.Endpoint, config.Conf.MinioConn.AccessKeyID, err.Error())
 	}
 
-	fmt.Println("MinIO client Setup successfully ")
+	if !ok {
+		fmt.Printf("Making new bucket: %s\n", bucketName)
+		err = minioClientInstance.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			return fmt.Errorf("Error making new bucket: %s, error: \n%s\n", bucketName, err.Error())
+		}
+	}
+
+	fmt.Println("MinIO client Setup successfully")
 	return nil
 }

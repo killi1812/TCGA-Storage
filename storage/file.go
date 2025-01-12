@@ -17,8 +17,6 @@ func New() *MinioStorage {
 	return &MinioStorage{}
 }
 
-const bucketName = "test"
-
 func (this *MinioStorage) Upload(file multipart.File, header *multipart.FileHeader) error {
 	lock.Lock()
 	defer lock.Unlock()
