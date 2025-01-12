@@ -13,9 +13,14 @@ or with winget.
 ___
 ### Docker, docker-compose
 Used for deployment of containers.
+Note that docker-compose uses MINIO_ROOT_USER and MINIO_ROOT_PASSWORD variables, it is best to define them in .env file as so
+
+    MINIO_ROOT_USER = admin
+    MINIO_ROOT_PASSWORD = admin1234
+
 ___
 ### .NET 7 
-Used for running the [scrapper](https://github.com/killi1812/PPPK-Scrapper)
+Used for running the [scrapper](https://github.com/killi1812/PPPK-Scrapper)+
 ## Running the app
 Create appsettings.json based on [appsettings.example.json](https://github.com/killi1812/TCGA-Storage/blob/master/appsettings.example.json).
 
