@@ -16,17 +16,17 @@ func Run() error {
 
 		err := download()
 		if err != nil {
-			fmt.Errorf("%s", err.Error())
+			fmt.Printf("%s\n", err.Error())
 		}
 
 		err = upload()
 		if err != nil {
-			fmt.Errorf("%s", err.Error())
+			fmt.Printf("%s\n", err.Error())
 		}
 
 		err = clean()
 		if err != nil {
-			fmt.Errorf("%s", err.Error())
+			fmt.Printf("%s\n", err.Error())
 		}
 		defer fileLock.Unlock()
 	}()

@@ -1,50 +1,118 @@
-(async () => {
-  const ping = async () => {
-    const resp = await fetch("/api/ping-minio");
-    const data = await resp.json();
-    alert(data);
-  };
+(() => {
+  let allPatients = [];
+  let filteredPatients = [];
+  let currentIndex = 0;
+  const patientsPerPage = 20; // Number of patients to load at a time
+  let isLoading = false;
+  let isFirstLoad = true; // Track if it's the first page load
 
-  const scrape = async () => {
-    const resp = await fetch("/api/scrape");
-    const data = await resp.json();
-    alert(data);
-  };
+  // Fetch patients from API and populate the table
+  async function fetchPatients() {
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const tableBody = document.getElementById("patientsTableBody");
 
-  const pingBtn = document.getElementById("ping");
-  pingBtn.addEventListener("click", ping);
+    // Show the loading spinner
+    loadingSpinner.style.display = "flex";
 
-  const scrapeBtn = document.getElementById("scrape");
-  scrapeBtn.addEventListener("click", scrape);
+    try {
+      const response = await fetch("/api/patients"); // Fetch from endpoint
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-  const img = document.getElementById("img");
-  const form = document.getElementById("upload");
+      allPatients = await response.json(); // Parse JSON response
+      filteredPatients = [...allPatients]; // Initialize filteredPatients
+      displayPatients();
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+      tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Failed to load data</td></tr>`;
+    } finally {
+      // Hide the loading spinner
+      loadingSpinner.style.display = "none";
+    }
+  }
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  // Function to display patients in the table (pagination)
+  function displayPatients() {
+    const tableBody = document.getElementById("patientsTableBody");
+    const startIndex = currentIndex;
+    const endIndex = Math.min(
+      currentIndex + patientsPerPage,
+      filteredPatients.length,
+    );
+    const patientsToDisplay = filteredPatients.slice(startIndex, endIndex);
 
-    const filenameInput = form.querySelector('[name="filename"]');
-    const filename = filenameInput ? filenameInput.value.trim() : "";
-    const formData = new FormData(form);
-    const response = await fetch(form.action || "/", {
-      method: form.method || "POST",
-      body: formData,
+    // Use a single fragment to append all rows at once for better performance
+    const fragment = document.createDocumentFragment();
+    patientsToDisplay.forEach((patient) => {
+      const row = document.createElement("tr");
+      row.onclick = () => navigateToPatientDetails(patient.bcr_patient_barcode); // Add click event
+      row.innerHTML = `
+                    <td>${patient.bcr_patient_barcode}</td>
+                    <td>${patient.dss ? "Yes" : "No"}</td>
+                    <td>${patient.os ? "Yes" : "No"}</td>
+                    <td>${patient.clinical_stage || "N/A"}</td>
+                `;
+      fragment.appendChild(row);
     });
-    const name = filename.split("\\")[2];
-    img.src = "/api/img/" + name;
-  });
+    tableBody.appendChild(fragment); // Append all rows at once
 
-  const dataForm = document.getElementById("data");
+    // Update current index for next batch of data
+    currentIndex = endIndex;
 
-  dataForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    // Check if we have loaded all patients and disable further loading
+    if (currentIndex >= filteredPatients.length) {
+      window.removeEventListener("scroll", handleScroll);
+    }
 
-    const filenameInput = dataForm.querySelector('[name="filename"]');
-    const filename = filenameInput ? filenameInput.value.trim() : "";
-    const dataFormData = new FormData(dataForm);
-    const response = await fetch(dataForm.action || "/", {
-      method: dataForm.method || "POST",
-      body: dataFormData,
+    // Reset scroll position to the top only on the first load
+    if (isFirstLoad) {
+      const tableContainer = document.getElementById("tableContainer");
+      tableContainer.scrollTop = 0;
+      isFirstLoad = false; // Ensure this only happens once
+    }
+  }
+
+  // Handle search form submit
+  function handleSearch(event) {
+    event.preventDefault();
+    const searchValue = document
+      .getElementById("patientCodeSearch")
+      .value.toLowerCase();
+    filteredPatients = allPatients.filter((patient) => {
+      return patient.bcr_patient_barcode.toLowerCase().includes(searchValue);
     });
-  });
+    currentIndex = 0; // Reset to start from the beginning
+    document.getElementById("patientsTableBody").innerHTML = ""; // Clear the table
+    displayPatients(); // Display filtered patients
+  }
+
+  // Lazy loading: load more patients when scrolling to the bottom of the table container
+  function handleScroll() {
+    const tableContainer = document.getElementById("tableContainer");
+    const bottom =
+      tableContainer.scrollHeight ===
+      tableContainer.scrollTop + tableContainer.clientHeight;
+    if (bottom && !isLoading) {
+      isLoading = true;
+      displayPatients();
+      isLoading = false;
+    }
+  }
+
+  document
+    .getElementById("searchForm")
+    .addEventListener("submit", handleSearch);
+
+  // Navigate to patient details page
+  function navigateToPatientDetails(patientBarcode) {
+    window.location.href = `patient-details/${patientBarcode}`; // Adjust this URL as needed
+  }
+
+  // Fetch patients when the page loads
+  window.onload = () => {
+    fetchPatients(); // Fetch all patients
+    const tableContainer = document.getElementById("tableContainer");
+    tableContainer.addEventListener("scroll", handleScroll); // Add event listener for lazy loading
+  };
 })();

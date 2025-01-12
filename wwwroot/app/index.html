@@ -1,31 +1,63 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patients List</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="/css/style.css" rel="stylesheet" />
   </head>
   <body>
-    <h1>bokic</h1>
-    <button id="ping">ping minio</button>
-    <button id="scrape">scrape data</button>
-    <form
-      id="upload"
-      action="/api/upload"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <input id="file" type="file" name="filename" />
-      <button type="submit">submit</button>
-    </form>
-    <form
-      id="data"
-      action="/api/data/upload"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <input id="file" type="file" name="filename" />
-      <button type="submit">submit</button>
-    </form>
+    <div id="loadingSpinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
-    <img id="img" src="/api/img/kori.jpg" />
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Patients List</h1>
+
+      <!-- Search Bar Form -->
+      <div class="form-container">
+        <form
+          id="searchForm"
+          class="d-flex mb-3"
+          onsubmit="return handleSearch(event)"
+        >
+          <input
+            type="text"
+            id="patientCodeSearch"
+            class="form-control"
+            placeholder="Enter Patient Code"
+          />
+          <button type="submit" class="btn btn-primary ms-2">Search</button>
+        </form>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container" id="tableContainer">
+        <table class="table table-hover table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>BCR Patient Barcode</th>
+              <th>DSS</th>
+              <th>OS</th>
+              <th>Clinical Stage</th>
+            </tr>
+          </thead>
+          <tbody id="patientsTableBody">
+            <!-- Rows will be inserted dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS (optional, if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/index.js"></script>
   </body>
 </html>
