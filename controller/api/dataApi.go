@@ -1,6 +1,7 @@
 package api
 
 import (
+	"TCGA-storage/dto"
 	"TCGA-storage/parser"
 	"TCGA-storage/storage"
 	"encoding/json"
@@ -30,8 +31,9 @@ func (this *DataController) getPatientData(w http.ResponseWriter, r *http.Reques
 	tmp := strings.Split(r.URL.Path, "/")
 	patientCode := tmp[len(tmp)-1]
 
-	fmt.Printf("patientCode: %v\n", patientCode)
 	//Get Data from mongo
+
+	patient := parser.PatientData{}
 
 	//Get data from files
 	p := parser.GetGeneParser()
@@ -41,13 +43,13 @@ func (this *DataController) getPatientData(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	fmt.Printf("files: %v\n", len(files))
 
 	if len(files) == 0 {
 		fmt.Printf("no files \n")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
 	counter := make(chan rune, len(files))
 	dataChan := make(chan parser.PatientGenesExpressions, 1)
 	for _, file := range files {
@@ -65,9 +67,9 @@ func (this *DataController) getPatientData(w http.ResponseWriter, r *http.Reques
 		<-counter
 	}
 
-	json.NewEncoder(w).Encode(<-dataChan)
-
+	dto := dto.NewPatientGensDto(patient, <-dataChan)
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(dto)
 }
 
 func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
