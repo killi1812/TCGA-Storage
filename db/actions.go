@@ -40,8 +40,9 @@ func InsertMany(arr []PatientData) error {
 }
 
 func Read(patientCode string) (PatientData, error) {
-	//TODO: check if lock needed
-	//TODO: need to waite utill unlocked
+	//TODO:
+	//check if lock needed
+	//need to wait utill unlocked
 	//dbLock.Lock()
 	//defer dbLock.Unlock()
 

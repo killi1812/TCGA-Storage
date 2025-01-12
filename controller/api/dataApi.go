@@ -34,8 +34,6 @@ func (this *DataController) getPatientData(w http.ResponseWriter, r *http.Reques
 	tmp := strings.Split(r.URL.Path, "/")
 	patientCode := tmp[len(tmp)-1]
 
-	//TODO:Get Data from mongo
-
 	patient, err := db.Read(patientCode)
 	if err != nil {
 		fmt.Printf("Failed retriving patient data, error: %s\n", err.Error())
@@ -98,7 +96,6 @@ func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Dailed parsing \n")
 		return
 	}
-	//TODO: insertsy empty
 
 	err = db.InsertMany(data)
 	if err != nil {

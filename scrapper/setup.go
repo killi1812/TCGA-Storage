@@ -11,7 +11,6 @@ const data = "Data"
 
 var minioStorage *storage.MinioStorage
 
-// TODO: add contex and abbyliti to cancle scraping
 var fileLock sync.Mutex
 var path string
 
