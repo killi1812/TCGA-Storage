@@ -14,7 +14,7 @@ ___
 ### Docker, docker-compose
 Used for deployment of containers.
 
-Note that docker-compose uses `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` variables, it is best to define them in .env file as so
+Note that docker-compose uses `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` variables, it is best to define them in [.env](example.env) file as so
 
     MINIO_ROOT_USER = admin
     MINIO_ROOT_PASSWORD = admin1234
