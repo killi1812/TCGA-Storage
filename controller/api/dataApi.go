@@ -1,6 +1,7 @@
 package api
 
 import (
+	"TCGA-storage/db"
 	"TCGA-storage/dto"
 	"TCGA-storage/parser"
 	"TCGA-storage/storage"
@@ -24,6 +25,8 @@ func (this *DataController) RegisterEndpoints() error {
 	})
 	http.HandleFunc("/api/data/upload", this.upload)
 	http.HandleFunc("/api/patient/data/", this.getPatientData)
+	http.HandleFunc("/api/patients", this.getAllPatients)
+	http.HandleFunc("/api/patients/delete", this.deleteAllPatients)
 	return nil
 }
 
@@ -31,21 +34,25 @@ func (this *DataController) getPatientData(w http.ResponseWriter, r *http.Reques
 	tmp := strings.Split(r.URL.Path, "/")
 	patientCode := tmp[len(tmp)-1]
 
-	//Get Data from mongo
+	//TODO:Get Data from mongo
 
-	patient := parser.PatientData{}
-
+	patient, err := db.Read(patientCode)
+	if err != nil {
+		fmt.Printf("Failed retriving patient data, error: %s\n", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	//Get data from files
 	p := parser.GetGeneParser()
-	files, err := this.store.GetAllReaders(patientCode)
+	files, err := this.store.GetAllReaders()
 	if err != nil {
-		fmt.Printf("failed retriving files \n")
+		fmt.Printf("Failed retriving files \n")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if len(files) == 0 {
-		fmt.Printf("no files \n")
+		fmt.Printf("No files \n")
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -56,20 +63,23 @@ func (this *DataController) getPatientData(w http.ResponseWriter, r *http.Reques
 		go func() {
 			data, err := p.Parse(file, patientCode)
 			defer file.Close()
-			counter <- 'a'
-			if err == parser.PatientNotFound {
-				return
+			if err == nil {
+				dataChan <- data
 			}
-			dataChan <- data
+			counter <- 'a'
 		}()
 	}
 	for i := 0; i < len(files); i++ {
 		<-counter
 	}
 
-	dto := dto.NewPatientGensDto(patient, <-dataChan)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(dto)
+	if len(dataChan) > 0 {
+		dto := dto.NewPatientGensDto(patient, <-dataChan)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(dto)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
 
 func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
@@ -85,11 +95,41 @@ func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
 	data, err := p.Parse(file)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Printf("failed parsing \n")
+		fmt.Printf("Dailed parsing \n")
+		return
+	}
+	//TODO: insertsy empty
+
+	fmt.Printf("data[0]: %v\n", data[0])
+
+	err = db.InsertMany(data)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Printf("Failed Saving to mongo \n")
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (this *DataController) getAllPatients(w http.ResponseWriter, r *http.Request) {
+	data, err := db.ReadAll()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Printf("Eeror reading patients\n")
 		return
 	}
 
-	writer := strings.Builder{}
-	json.NewEncoder(&writer).Encode(data)
-	fmt.Printf("writer: %v\n", writer.String())
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(data)
+}
+
+func (this *DataController) deleteAllPatients(w http.ResponseWriter, r *http.Request) {
+	err := db.DeleteAll()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Printf("Eeror reading patients\n")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

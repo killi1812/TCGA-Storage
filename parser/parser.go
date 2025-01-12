@@ -1,15 +1,17 @@
 package parser
 
 import (
+	"TCGA-storage/db"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"slices"
 	"strconv"
+	"strings"
 )
 
-func (this *PatientParser) Parse(reader io.Reader) ([]PatientData, error) {
-	var result []PatientData
+func (this *PatientParser) Parse(reader io.Reader) ([]db.PatientData, error) {
+	var result []db.PatientData
 
 	csvReader := csv.NewReader(reader)
 	csvReader.Comma = '\t'
@@ -31,7 +33,7 @@ func (this *PatientParser) Parse(reader io.Reader) ([]PatientData, error) {
 		}
 
 		// Parse the fields into the struct
-		data := PatientData{
+		data := db.PatientData{
 			BCRPatientBarcode: record[1],
 			ClinicalStage:     record[7],
 			OS:                stob(record[25]),
@@ -53,7 +55,9 @@ func (this *GeneParser) Parse(reader io.ReadCloser, patientCode string) (Patient
 	// Read the header
 	header, err := csvReader.Read()
 	patients := header[1:]
-	index := slices.Index(patients, patientCode)
+	index := slices.IndexFunc(patients, func(patient string) bool {
+		return strings.Contains(patient, patientCode)
+	})
 	if index == -1 {
 		return PatientGenesExpressions{}, PatientNotFound
 	}

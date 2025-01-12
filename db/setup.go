@@ -12,24 +12,44 @@ import (
 
 var connString string
 var dbLock sync.Mutex
+var mongoDb *mongo.Client
+var patients *mongo.Collection
+
+const database = "tcga-storage"
+const collection = "patients"
 
 func Setup() error {
 	connString = config.Conf.MongoConnString
 	dbLock = sync.Mutex{}
 
 	fmt.Printf("Setting up mongo\n")
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connString))
 
-	if err != nil {
+	if err := connect(); err != nil {
 		return err
 	}
 
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-
 	fmt.Printf("Mongo setup compleat\n")
+	return nil
+}
+
+func connect() error {
+	dbLock.Lock()
+	defer dbLock.Unlock()
+
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connString))
+	if err != nil {
+		return err
+	}
+	mongoDb = client
+
+	patients = client.Database(database).Collection(collection)
+
+	return nil
+}
+
+func Disconnect() error {
+	if err := mongoDb.Disconnect(context.Background()); err != nil {
+		return err
+	}
 	return nil
 }

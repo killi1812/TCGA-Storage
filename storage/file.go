@@ -54,7 +54,7 @@ func (this *MinioStorage) UploadFile(file *os.File, fileName string, size int64)
 	return nil
 }
 
-func (this *MinioStorage) GetAllReaders(name string) ([]io.ReadCloser, error) {
+func (this *MinioStorage) GetAllReaders() ([]io.ReadCloser, error) {
 	lock.Lock()
 	defer lock.Unlock()
 	readers := make([]io.ReadCloser, 0)

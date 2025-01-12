@@ -64,6 +64,7 @@ func main() {
 }
 
 func cleanup() {
+	fmt.Printf("Disconnecting from mongo, error: %v", db.Disconnect())
 	fmt.Println("\nBye 👋")
 	os.Exit(0)
 }

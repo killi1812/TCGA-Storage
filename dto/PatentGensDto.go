@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"TCGA-storage/db"
 	"TCGA-storage/parser"
 )
 
@@ -17,7 +18,7 @@ type GeneExpressionDto struct {
 	Expression float64 `json:"expression"`
 }
 
-func NewPatientGensDto(patient parser.PatientData, data parser.PatientGenesExpressions) PatientGensDto {
+func NewPatientGensDto(patient db.PatientData, data parser.PatientGenesExpressions) PatientGensDto {
 	return PatientGensDto{
 		BCRPatientBarcode: patient.BCRPatientBarcode,
 		DSS:               patient.DSS,
