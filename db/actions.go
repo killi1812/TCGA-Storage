@@ -31,13 +31,10 @@ func InsertMany(arr []PatientData) error {
 		bson[i] = arr[i]
 	}
 
-	fmt.Printf("data[0]: %v\n", bson[0])
 	_, err := patients.InsertMany(context.Background(), bson)
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("Succesfly inserted %d patients\n", len(bson))
 
 	return nil
 }
@@ -47,7 +44,7 @@ func Read(patientCode string) (PatientData, error) {
 	//TODO: need to waite utill unlocked
 	//dbLock.Lock()
 	//defer dbLock.Unlock()
-	fmt.Printf("patientCode: %v\n", patientCode)
+
 	var patient PatientData
 	filter := bson.M{"bcr_patient_barcode": patientCode}
 

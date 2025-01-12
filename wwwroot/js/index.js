@@ -2,7 +2,7 @@
   let allPatients = [];
   let filteredPatients = [];
   let currentIndex = 0;
-  const patientsPerPage = 20; // Number of patients to load at a time
+  const patientsPerPage = 30; // Number of patients to load at a time
   let isLoading = false;
   let isFirstLoad = true; // Track if it's the first page load
 
@@ -87,7 +87,6 @@
     displayPatients(); // Display filtered patients
   }
 
-  // Lazy loading: load more patients when scrolling to the bottom of the table container
   function handleScroll() {
     const tableContainer = document.getElementById("tableContainer");
     const bottom =

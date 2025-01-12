@@ -1,7 +1,6 @@
 package ftp
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -19,6 +18,5 @@ func (this *PageController) RegisterEndpoints() error {
 }
 
 func (this PageController) patientDetails(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Serving file\n ")
 	http.ServeFile(w, r, "./wwwroot/app/patient-details.html")
 }

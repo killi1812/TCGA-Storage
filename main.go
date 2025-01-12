@@ -50,7 +50,6 @@ func main() {
 
 	err = config.RegiserControllers([]config.Controller{
 		ftp.NewPageController(),
-		api.NewTestController(),
 		api.NewScrapperController(),
 		api.NewDataController(),
 	})

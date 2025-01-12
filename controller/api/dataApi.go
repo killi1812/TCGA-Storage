@@ -100,8 +100,6 @@ func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
 	}
 	//TODO: insertsy empty
 
-	fmt.Printf("data[0]: %v\n", data[0])
-
 	err = db.InsertMany(data)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -109,6 +107,7 @@ func (this *DataController) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(fmt.Sprintf("Succesfly inserted %d patients\n", len(data)))
 }
 
 func (this *DataController) getAllPatients(w http.ResponseWriter, r *http.Request) {
