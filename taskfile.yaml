@@ -29,6 +29,15 @@ tasks:
       - cmd: cp -r ./wwwroot {{.BUILD_LOCATION}}
       - cmd: go build -o {{.BUILD_LOCATION}}/{{.PROJECT_CODE}}
 
+  build-windows:
+    env:
+      GOOS: windows
+      GOARCH: amd64
+    cmds:
+      - cmd: mkdir -p {{.BUILD_LOCATION}}
+      - cmd: cp -r ./wwwroot {{.BUILD_LOCATION}}
+      - cmd: go build -o {{.BUILD_LOCATION}}/{{.PROJECT_CODE}}.exe
+
   clean:
     cmd: rm -rf {{.BUILD_LOCATION}}/*
 
